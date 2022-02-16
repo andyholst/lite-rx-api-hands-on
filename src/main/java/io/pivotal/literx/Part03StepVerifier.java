@@ -16,10 +16,12 @@
 
 package io.pivotal.literx;
 
-import java.util.function.Supplier;
-
 import io.pivotal.literx.domain.User;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
+import java.util.function.Supplier;
 
 /**
  * Learn how to use StepVerifier to test Mono, Flux or any other kind of Reactive Streams Publisher.
@@ -31,43 +33,59 @@ public class Part03StepVerifier {
 
 //========================================================================================
 
-	// TODO Use StepVerifier to check that the flux parameter emits "foo" and "bar" elements then completes successfully.
 	void expectFooBarComplete(Flux<String> flux) {
-		fail();
+		StepVerifier
+				.create(flux)
+				.expectNext("foo")
+				.expectNext("bar")
+				.verifyComplete();
 	}
 
 //========================================================================================
 
-	// TODO Use StepVerifier to check that the flux parameter emits "foo" and "bar" elements then a RuntimeException error.
 	void expectFooBarError(Flux<String> flux) {
-		fail();
+		StepVerifier
+				.create(flux)
+				.expectNext("foo")
+				.expectNext("bar")
+				.verifyError(RuntimeException.class);
 	}
 
 //========================================================================================
 
-	// TODO Use StepVerifier to check that the flux parameter emits a User with "swhite"username
-	// and another one with "jpinkman" then completes successfully.
 	void expectSkylerJesseComplete(Flux<User> flux) {
-		fail();
+		StepVerifier
+				.create(flux)
+				.expectNextMatches(user -> "swhite".equals(user.getUsername()))
+				.expectNextMatches(user -> "jpinkman".equals(user.getUsername()))
+				.verifyComplete();
 	}
 
 //========================================================================================
 
-	// TODO Expect 10 elements then complete and notice how long the test takes.
 	void expect10Elements(Flux<Long> flux) {
-		fail();
+		StepVerifier
+				.create(flux)
+				.thenAwait(Duration.ofSeconds(1L))
+				.expectNext(0L)
+				.expectNext(1L)
+				.expectNext(2L)
+				.expectNext(3L)
+				.expectNext(4L)
+				.expectNext(5L)
+				.expectNext(6L)
+				.expectNext(7L)
+				.expectNext(8L)
+				.expectNext(9L)
+				.verifyComplete();
 	}
 
 //========================================================================================
 
-	// TODO Expect 3600 elements at intervals of 1 second, and verify quicker than 3600s
-	// by manipulating virtual time thanks to StepVerifier#withVirtualTime, notice how long the test takes
 	void expect3600Elements(Supplier<Flux<Long>> supplier) {
-		fail();
+		StepVerifier.withVirtualTime(supplier)
+				.thenAwait(Duration.ofSeconds(3600))
+				.expectNextCount(3600)
+				.verifyComplete();
 	}
-
-	private void fail() {
-		throw new AssertionError("workshop not implemented");
-	}
-
 }
